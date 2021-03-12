@@ -15,15 +15,44 @@ export function TaskList() {
   const [newTaskTitle, setNewTaskTitle] = useState('');
 
   function handleCreateNewTask() {
-    // Crie uma nova task com um id random, não permita criar caso o título seja vazio.
+    if(!newTaskTitle) return;
+    
+    const newTask = {
+      id: Math.random(), // não é recomendado em aplicações sérias!!!
+      title: newTaskTitle,
+      isComplete: false,
+    }
+
+    // O setState (setTasks no caso) pode ser utilizado na forma de callback.
+    // Isso é vantajoso porque a renderização do React com setState ocorre
+    // de forma assíncrona, então pode ser que ela demore para atualizar o valor
+    // na tela e eu esteja interagindo com um valor antigo desatualizado.
+    // Imagine por exemplo que a gente está clicando no botão de forma bem
+    // rápida. Como garantir que o valor sendo calculado no setState é realmente
+    // o valor anterior e que eu não estou pegando um valor desatualizado?
+    // Para resolver esse problema, ao invés de fazer simplismente:
+    // setTasks([...tasks, newTask])
+    // é melhor fazer da forma abaixo:
+    setTasks(oldState => [...oldState, newTask]);
+    // Esse tipo de resolução é chamado de Atualizações Funcionais, e ela
+    // garante que o valor sendo atualizado é o valor atual.
+
+    setNewTaskTitle('');
   }
 
   function handleToggleTaskCompletion(id: number) {
-    // Altere entre `true` ou `false` o campo `isComplete` de uma task com dado ID
+    const updatedTasks = tasks.map(task => task.id === id ? {
+      ...task,
+      isComplete: !task.isComplete,
+    } : task);
+
+    setTasks(updatedTasks);
   }
 
   function handleRemoveTask(id: number) {
-    // Remova uma task da listagem pelo ID
+    const filteredTasks = tasks.filter(task => task.id !== id);
+
+    setTasks(filteredTasks);
   }
 
   return (
